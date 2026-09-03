@@ -1,0 +1,86 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Band from '../components/Band.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import LinkRow from '../components/LinkRow.astro';
+import site from '../data/site.json';
+import { byOrder } from '../lib/content';
+
+const socials = (await getCollection('socials')).sort(byOrder);
+const tags = (await getCollection('hashtags')).sort(byOrder);
+---
+
+<BaseLayout title="Links" description="Every place to find starbie — Twitch, YouTube, Discord, X, TikTok, Instagram, and VGen — plus her hashtags.">
+  <Band tone="baby" divider="white">
+    <SectionHeading eyebrow="Find me" title="Links" hue="purple" as="h1" />
+    <div class="rows measure">
+      {socials.map((s) => (
+        <LinkRow href={s.data.url} label={s.data.label} icon={s.data.icon} hue={s.data.hue} blurb={s.data.blurb} />
+      ))}
+    </div>
+  </Band>
+
+  <Band tone="white" divider="lilac" texture="grid">
+    <SectionHeading eyebrow="Tag your posts" title="Hashtags" hue="pink" flourish />
+    <dl class="tags measure">
+      {tags.map((t) => (
+        <div class="tag">
+          <dt style={`color:var(--c-${t.data.hue}-deep)`}>
+            {t.data.tag}
+            {t.data.adult && <span class="badge">18+</span>}
+          </dt>
+          <dd>{t.data.purpose}</dd>
+        </div>
+      ))}
+    </dl>
+    <p class="note">
+      Adult-tagged fan art lives on social platforms only — none of it is hosted or shown on this site.
+    </p>
+  </Band>
+
+  <Band tone="lilac">
+    <SectionHeading eyebrow="Work enquiries" title="Business" hue="teal" flourish />
+    {site.businessEmail
+      ? <p class="biz"><a href={`mailto:${site.businessEmail}`}>{site.businessEmail}</a></p>
+      : <p class="biz">Business enquiries are best sent through <a href="https://x.com/starbievt" target="_blank" rel="noopener">X</a> or my <a href="https://discord.gg/Ws2Ger6gFQ" target="_blank" rel="noopener">Discord</a>.</p>}
+  </Band>
+</BaseLayout>
+
+<style>
+  .rows { display: grid; }
+
+  .tags { display: grid; gap: 1.25rem; margin: 0; }
+  .tag { display: grid; gap: 0.15rem; }
+
+  .tag dt {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .tag dd { margin: 0; color: var(--band-ink-soft); }
+
+  .badge {
+    font-size: 0.7rem;
+    letter-spacing: var(--tracking-label);
+    padding: 0.15rem 0.55rem;
+    border-radius: var(--radius);
+    background: var(--color-line);
+    color: #fff;
+  }
+
+  .note {
+    max-width: var(--container-narrow);
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 2px solid var(--color-rule);
+    font-size: var(--size-small);
+    color: var(--band-ink-soft);
+  }
+
+  .biz { font-size: 1.1rem; }
+</style>

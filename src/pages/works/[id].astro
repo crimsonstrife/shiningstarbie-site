@@ -1,0 +1,82 @@
+---
+import type { GetStaticPaths } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Band from '../../components/Band.astro';
+import WorkMedia from '../../components/WorkMedia.astro';
+import { includeDrafts, hasWriteup, formatDate } from '../../lib/content';
+import { href } from '../../lib/urls';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const works = await getCollection('works', ({ data }) => includeDrafts || !data.draft);
+  return works.map((work) => ({ params: { id: work.id }, props: { work } }));
+};
+
+interface Props {
+  work: CollectionEntry<'works'>;
+}
+
+const { work } = Astro.props;
+const { Content } = await render(work);
+const writeup = hasWriteup(work.body);
+
+const KIND_LABEL: Record<string, string> = { art: 'Art', music: 'Music', sound: 'Sound design' };
+---
+
+<BaseLayout title={work.data.title} description={work.data.summary || `${KIND_LABEL[work.data.kind]} by starbie.`} ogType="article">
+  <Band tone="white">
+    <p class="crumb"><a href={href('/works')}>← All works</a></p>
+
+    <p class="eyebrow">{KIND_LABEL[work.data.kind]} · {formatDate(work.data.date)}</p>
+    <h1>{work.data.title}</h1>
+    {work.data.summary && <p class="summary">{work.data.summary}</p>}
+
+    <div class="media">
+      <WorkMedia media={work.data.media} title={work.data.title} embed eager />
+    </div>
+
+    {work.data.credit && (
+      <p class="credit">
+        {work.data.credit.role ?? 'Art'} by{' '}
+        {work.data.credit.url
+          ? <a href={work.data.credit.url} target="_blank" rel="noopener">{work.data.credit.name}</a>
+          : work.data.credit.name}
+      </p>
+    )}
+
+    {writeup && <div class="prose"><Content /></div>}
+
+    {work.data.tags.length > 0 && (
+      <ul class="tags">
+        {work.data.tags.map((t) => <li>{t}</li>)}
+      </ul>
+    )}
+  </Band>
+</BaseLayout>
+
+<style>
+  .crumb { margin-bottom: 2rem; font-family: var(--font-display); font-weight: 700; }
+  h1 { max-width: 20ch; font-size: clamp(2rem, 1.5rem + 2.2vw, 3rem); margin-bottom: 0.6rem; }
+  .summary { font-size: 1.15rem; color: var(--color-ink-soft); max-width: 52ch; }
+  .media { max-width: var(--container-narrow); margin-top: 2rem; }
+  .credit { margin-top: 0.9rem; font-size: var(--size-small); color: var(--color-ink-soft); }
+
+  .tags {
+    max-width: var(--container-narrow);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 2.5rem 0 0;
+    padding: 1.25rem 0 0;
+    border-top: 2px solid var(--color-rule);
+  }
+
+  .tags li {
+    padding: 0.25rem 0.8rem;
+    border-radius: var(--radius);
+    background: var(--color-surface-sunk);
+    font-size: var(--size-small);
+  }
+</style>

@@ -1,0 +1,100 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
+/**
+ * Render the medium attached to a work. The schema is a discriminated union,
+ * so a new platform needs a variant there and a matching branch here.
+ */
+interface Props {
+  media: CollectionEntry<'works'>['data']['media'];
+  title: string;
+  /** Detail pages get an embed; listings get a still and a link. */
+  embed?: boolean;
+  eager?: boolean;
+}
+const { media, title, embed = false, eager = false } = Astro.props;
+---
+
+{media.type === 'image' && (
+  <Image
+    class="media media--image"
+    src={media.src}
+    alt={media.alt}
+    widths={[400, 800, 1200]}
+    sizes="(max-width: 720px) 100vw, 720px"
+    loading={eager ? 'eager' : 'lazy'}
+  />
+)}
+
+{media.type === 'youtube' && (embed ? (
+  <div class="media media--frame">
+    <iframe
+      src={`https://www.youtube-nocookie.com/embed/${media.videoId}`}
+      title={title}
+      loading="lazy"
+      allow="accelerometer; clipboard-write; encrypted-media; picture-in-picture"
+      allowfullscreen
+    ></iframe>
+  </div>
+) : media.poster ? (
+  <Image class="media media--image" src={media.poster} alt="" widths={[400, 800]} loading="lazy" />
+) : (
+  <img
+    class="media media--image"
+    src={`https://i.ytimg.com/vi/${media.videoId}/hqdefault.jpg`}
+    alt=""
+    loading="lazy"
+    width="480"
+    height="360"
+  />
+))}
+
+{media.type === 'soundcloud' && (embed ? (
+  <div class="media media--audio">
+    <iframe
+      src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(media.trackUrl)}&color=%239070c0&visual=false`}
+      title={title}
+      loading="lazy"
+      allow="autoplay"
+    ></iframe>
+  </div>
+) : media.poster ? (
+  <Image class="media media--image" src={media.poster} alt="" widths={[400, 800]} loading="lazy" />
+) : null)}
+
+{media.type === 'bandcamp' && (embed ? (
+  <div class="media media--audio">
+    <iframe
+      src={`https://bandcamp.com/EmbeddedPlayer/${media.embedId}/size=large/bgcol=ffffff/linkcol=9070c0/tracklist=false/transparent=true/`}
+      title={title}
+      loading="lazy"
+    ></iframe>
+  </div>
+) : media.poster ? (
+  <Image class="media media--image" src={media.poster} alt="" widths={[400, 800]} loading="lazy" />
+) : null)}
+
+<style>
+  .media { display: block; width: 100%; border-radius: 18px; }
+
+  .media--image { height: auto; object-fit: cover; }
+
+  .media--frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--color-line);
+  }
+
+  .media--frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .media--audio { height: 166px; }
+  .media--audio iframe { width: 100%; height: 100%; border: 0; }
+</style>

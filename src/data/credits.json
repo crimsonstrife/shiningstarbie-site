@@ -1,0 +1,184 @@
+[
+  {
+    "id": "maygebee",
+    "name": "Maygebee",
+    "role": "live2d",
+    "url": "https://vgen.co/maygebee",
+    "note": "Artist & rigger",
+    "avatar": "../assets/people/maygebee-profile-image.jpg"
+  },
+  {
+    "id": "mariabirigui",
+    "name": "MariaBirigui",
+    "role": "illustration"
+  },
+  {
+    "id": "neciaheda",
+    "name": "NeciaHeda",
+    "role": "illustration"
+  },
+  {
+    "id": "starrynekoart",
+    "name": "StarryNekoArt",
+    "role": "illustration"
+  },
+  {
+    "id": "virusap",
+    "name": "VirusAP",
+    "role": "illustration",
+    "url": "https://vgen.co/virusap77"
+  },
+  {
+    "id": "mimi2399",
+    "name": "Mimi2399",
+    "role": "illustration"
+  },
+  {
+    "id": "matiospepperoni",
+    "name": "MatiosPepperoni",
+    "role": "illustration",
+    "url": "https://vgen.co/MatiosPepperoni",
+    "note": "Key art"
+  },
+  {
+    "id": "ahlatoad",
+    "name": "Ahlatoad",
+    "role": "illustration"
+  },
+  {
+    "id": "lobitchan",
+    "name": "Lobitchan_Real",
+    "role": "illustration"
+  },
+  {
+    "id": "misslepard",
+    "name": "Miss Lepard",
+    "role": "illustration"
+  },
+  {
+    "id": "kitbeary",
+    "name": "Kitbeary",
+    "role": "illustration",
+    "url": "https://vgen.co/kitbeary"
+  },
+  {
+    "id": "peppi",
+    "name": "Peppi",
+    "role": "illustration"
+  },
+  {
+    "id": "kotablickie",
+    "name": "Kotablickie",
+    "role": "illustration"
+  },
+  {
+    "id": "cheriiart",
+    "name": "Cheriiart",
+    "role": "illustration"
+  },
+  {
+    "id": "coconatt0",
+    "name": "Coconatt0",
+    "role": "illustration"
+  },
+  {
+    "id": "xmarumaru",
+    "name": "xmarumaru",
+    "role": "overlays",
+    "url": "https://vgen.co/Xmarumaru",
+    "avatar": "../assets/people/xmarumaru-profile-image.jpg"
+  },
+  {
+    "id": "jamjuce",
+    "name": "JamJuce",
+    "role": "animation",
+    "url": "https://vgen.co/JamJuce",
+    "note": "Animated screens",
+    "avatar": "../assets/people/jamjuce-profile-image.jpg"
+  },
+  {
+    "id": "stvrwish",
+    "name": "stvrwish",
+    "role": "animation"
+  },
+  {
+    "id": "hanasakiyunarin",
+    "name": "hanasakiyunarin",
+    "role": "animation"
+  },
+  {
+    "id": "mokachii",
+    "name": "mokachii",
+    "role": "animation"
+  },
+  {
+    "id": "albanna",
+    "name": "albanna studios",
+    "role": "emotes"
+  },
+  {
+    "id": "xxhexie",
+    "name": "xxhexie",
+    "role": "emotes"
+  },
+  {
+    "id": "kaerupoota",
+    "name": "kaerupoota",
+    "role": "emotes"
+  },
+  {
+    "id": "aquaaocean",
+    "name": "aquaaocean",
+    "role": "emotes"
+  },
+  {
+    "id": "kiuzzu",
+    "name": "kiuzzu",
+    "role": "emotes"
+  },
+  {
+    "id": "ruiproduction",
+    "name": "rui production",
+    "role": "emotes"
+  },
+  {
+    "id": "kcpasin",
+    "name": "kcpasin",
+    "role": "emotes"
+  },
+  {
+    "id": "albertow0",
+    "name": "albert_ow0",
+    "role": "emotes"
+  },
+  {
+    "id": "ourobella",
+    "name": "Ourobella",
+    "role": "editing",
+    "url": "https://vgen.co/ourobella",
+    "note": "Trailer",
+    "avatar": "../assets/people/ourobella-profile-image.jpg"
+  },
+  {
+    "id": "toricosmica",
+    "name": "Tori Cosmica",
+    "role": "management",
+    "url": "https://x.com/ToriCosmica",
+    "avatar": "../assets/people/tori-cosmica-profile-image.jpg"
+  },
+  {
+    "id": "kairielvt",
+    "name": "KairielVT",
+    "role": "management",
+    "url": "https://x.com/kairielVT",
+    "avatar": "../assets/people/kairielvt-profile-image.jpg"
+  },
+  {
+    "id": "crimsonstrife",
+    "name": "CrimsonStrife",
+    "role": "web",
+    "note": "Web Developer/Designer",
+    "url": "https://vgen.co/crimsonstrife",
+    "avatar": "../assets/people/crimsonstrife-profile-image.png"
+  }
+]

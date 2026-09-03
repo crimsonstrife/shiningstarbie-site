@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import { byOrder } from '../lib/content';
+
+/**
+ * The colored labels come straight from her existing About graphic, so this
+ * list repeats a pattern her audience has already seen.
+ */
+const facts = (await getCollection('profile')).sort(byOrder);
+---
+
+<dl class="facts">
+  {facts.map((f) => (
+    <div class="fact">
+      <dt style={`background:var(--c-${f.data.hue})`}>{f.data.label}</dt>
+      <dd>{f.data.value}</dd>
+    </div>
+  ))}
+</dl>
+
+<style>
+  .facts { display: grid; gap: 0.85rem; margin: 0; }
+
+  .fact {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .fact dt {
+    flex: none;
+    min-width: 8.5rem;
+    padding: 0.35rem 1rem;
+    border-radius: var(--radius);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-line);
+    text-align: center;
+  }
+
+  .fact dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.05rem, 0.98rem + 0.4vw, 1.3rem);
+  }
+
+  @media (max-width: 480px) {
+    .fact dt { min-width: 7rem; font-size: 0.85rem; }
+  }
+</style>

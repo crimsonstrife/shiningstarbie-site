@@ -1,0 +1,72 @@
+---
+/**
+ * The two decorative rules she uses: a row of stars and a chain of loops. Both
+ * are ornamental, so assistive technology doesn't need to announce them.
+ *
+ * They render as a CSS mask filled with `--flourish-color`, so one asset works
+ * in any color. A data-URI SVG can't read a CSS variable, and a fixed pink
+ * would be nearly invisible on the blossom band.
+ */
+interface Props {
+  variant?: 'stars' | 'loops';
+  /**
+   * Stars default to the compact 3rem cluster her Carrd uses. `full` runs them
+   * the whole width; loops are always full width, which is how she uses them.
+   */
+  width?: 'compact' | 'full';
+  /** Overrides the pink where it would disappear into the background. */
+  color?: string;
+  align?: 'left' | 'center';
+  class?: string;
+}
+
+const {
+  variant = 'stars',
+  color,
+  align = 'left',
+  width = variant === 'stars' ? 'compact' : 'full',
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class:list={['flourish', `flourish--${variant}`, `flourish--${align}`, `flourish--${width}`, className]}
+  style={color ? `--flourish-color:${color}` : undefined}
+  aria-hidden="true"
+></div>
+
+<style>
+  .flourish {
+    /* The mask supplies the shape; the background color is the visible part. */
+    background-color: var(--flourish-color);
+    -webkit-mask-repeat: repeat-x;
+    mask-repeat: repeat-x;
+    -webkit-mask-position: left center;
+    mask-position: left center;
+  }
+
+  .flourish--center {
+    -webkit-mask-position: center center;
+    mask-position: center center;
+  }
+
+  .flourish--compact { width: 3rem; }
+  .flourish--compact.flourish--center { margin-inline: auto; }
+  .flourish--full { width: 100%; }
+
+  .flourish--stars {
+    height: 1.75rem;
+    -webkit-mask-image: var(--image-flourish-stars);
+    mask-image: var(--image-flourish-stars);
+    -webkit-mask-size: auto 124%;
+    mask-size: auto 124%;
+  }
+
+  .flourish--loops {
+    height: 2.25rem;
+    -webkit-mask-image: var(--image-flourish-loops);
+    mask-image: var(--image-flourish-loops);
+    -webkit-mask-size: auto 100%;
+    mask-size: auto 100%;
+  }
+</style>

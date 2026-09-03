@@ -1,0 +1,141 @@
+---
+/**
+ * A full-bleed horizontal section. Bands use a change of color and a cloud
+ * edge instead of putting another border around every piece of content.
+ *
+ * Contrast is handled here instead of being left to every child component. On
+ * a tinted band, ink clears AA against all seven pastels (see tokens.css).
+ * `--band-underline` puts the bright color on a link's underline without using
+ * it for the label, where it wouldn't have enough contrast.
+ */
+interface Props {
+  tone?: 'white' | 'sunk' | 'yellow' | 'lavender' | 'sky' | 'mint' | 'blossom' | 'baby' | 'lilac';
+  /** Optional background texture. */
+  texture?: 'none' | 'grid' | 'stars';
+  /** Tone of the band that follows, which fills the cloud edge drawn below. */
+  divider?: Props['tone'];
+  id?: string;
+  narrow?: boolean;
+  class?: string;
+}
+
+const { tone = 'white', divider, id, narrow = false, texture = 'none', class: className } = Astro.props;
+
+const TONE_BG: Record<string, string> = {
+  white: 'var(--color-surface)',
+  sunk: 'var(--color-surface-sunk)',
+  yellow: 'var(--c-yellow)',
+  lavender: 'var(--c-lavender)',
+  sky: 'var(--c-sky)',
+  mint: 'var(--c-mint)',
+  blossom: 'var(--c-blossom)',
+  baby: 'var(--c-baby)',
+  lilac: 'var(--c-lilac)',
+};
+
+/** The bright spectrum color each tone uses for link underlines. */
+const TONE_UNDERLINE: Record<string, string> = {
+  white: 'var(--c-purple)',
+  sunk: 'var(--c-purple)',
+  yellow: 'var(--c-terracotta)',
+  lavender: 'var(--c-gold)',
+  sky: 'var(--c-terracotta)',
+  mint: 'var(--c-purple)',
+  blossom: 'var(--c-teal)',
+  baby: 'var(--c-terracotta)',
+  lilac: 'var(--c-teal)',
+};
+
+const tinted = tone !== 'white' && tone !== 'sunk';
+---
+
+<section
+  id={id}
+  class:list={[
+    'band',
+    { 'band--tinted': tinted, 'band--has-divider': divider },
+    texture !== 'none' && `band--${texture}`,
+    className,
+  ]}
+  style={`--band-bg:${TONE_BG[tone]};--band-underline:${TONE_UNDERLINE[tone]}`}
+>
+  <div class:list={['wrap', { 'wrap--narrow': narrow }]}>
+    <slot />
+  </div>
+
+  {divider && (
+    <svg class="cloud" viewBox="0 0 1200 64" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <path
+        style={`fill:${TONE_BG[divider]}`}
+        d="M0,64 L0,34
+           a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0
+           a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0
+           a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0
+           a60,30 0 0,1 120,0 L1200,64 Z"
+      />
+    </svg>
+  )}
+</section>
+
+<style>
+  .band {
+    /* Every band tone is a light ground, where the soft pink vanishes. */
+    --flourish-color: var(--flourish-color-deep);
+    position: relative;
+    background: var(--band-bg);
+    color: var(--band-ink, var(--color-ink));
+    padding-block: var(--band-pad);
+  }
+
+  /* Ink clears AA on every pastel; the deep spectrum does not. */
+  .band--tinted {
+    --band-ink: var(--color-ink);
+    --band-ink-soft: color-mix(in srgb, var(--color-ink) 78%, transparent);
+  }
+
+  .band--has-divider { padding-bottom: calc(var(--band-pad) + 64px); }
+
+  /* The texture sits behind the content and can't intercept a pointer. */
+  .band--grid::before,
+  .band--stars::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .band--grid::before {
+    opacity: var(--grid-opacity);
+    background-image:
+      repeating-linear-gradient(to right,
+        var(--grid-color) 0 var(--grid-line), transparent var(--grid-line) var(--grid-size)),
+      repeating-linear-gradient(to bottom,
+        var(--grid-color) 0 var(--grid-line), transparent var(--grid-line) var(--grid-size));
+  }
+
+  .band--stars::before {
+    opacity: var(--stars-opacity);
+    background-image: var(--image-falling-stars);
+    background-repeat: repeat;
+    background-size: var(--stars-tile) var(--stars-tile);
+  }
+
+  /* This is the same field held still, so reduced motion doesn't also mean
+     losing the decoration. */
+  @media (prefers-reduced-motion: reduce) {
+    .band--stars::before { background-image: var(--image-falling-stars-still); }
+  }
+
+  .band > .wrap { position: relative; z-index: 1; }
+
+  .cloud {
+    z-index: 2;
+    position: absolute;
+    left: 0;
+    bottom: -1px;   /* Covers the hairline seam some browsers render. */
+    width: 100%;
+    height: 64px;
+    display: block;
+  }
+</style>

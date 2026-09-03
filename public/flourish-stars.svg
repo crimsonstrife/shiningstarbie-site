@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Her Carrd divider: one full star in the centre, with two half-stars at
+       the tile edges so repeating the image makes an evenly spaced row. This
+       is a CSS mask, so the fill only needs to be opaque; tokens.css supplies
+       the visible color. A double hyphen is illegal inside an XML comment and
+       stops the image from loading, so do not write custom property names here. -->
+  <path d="M254.4,103.2l51.8,83.6l96.2,23.7l-63.6,75.4l7.4,98.4l-91.8-37l-91.8,37l7.4-98.4l-63.6-75.4l96.2-23.7L254.4,103.2z"/>
+  <path d="M-0.1,176.2l29.6,47.6l54.9,13.5L48,280.2l4.2,56l-52.4-21.1l-52.4,21.1l4.2-56l-36.3-42.9l54.9-13.5L-0.1,176.2z"/>
+  <path d="M511.9,176.2l29.6,47.6l54.9,13.5L560,280.2l4.2,56l-52.4-21.1l-52.4,21.1l4.2-56l-36.3-42.9l54.9-13.5L511.9,176.2z"/>
+</svg>

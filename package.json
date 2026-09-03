@@ -1,0 +1,33 @@
+{
+  "name": "shiningstarbie-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Promotional site for starbie \u2014 VTuber, artist, music composer, and sound designer",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "check": "astro check",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check:content": "node scripts/check-content.mjs",
+    "prebuild": "node scripts/check-content.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "@fontsource-variable/baloo-2": "^5.2.5",
+    "@fontsource-variable/nunito": "^5.2.5",
+    "@iconify-json/fa6-brands": "^1.2.6",
+    "@iconify-json/fa6-solid": "^1.2.4",
+    "astro": "^7.2.9",
+    "astro-icon": "^1.2.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^5.9.0"
+  }
+}

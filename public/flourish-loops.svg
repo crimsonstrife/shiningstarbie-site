@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Her Carrd header and footer line enters at the left edge, loops once, and
+       exits at the right. Repeating the image therefore makes one continuous
+       chain. Her original used vector-effect="non-scaling-stroke" with a 3px
+       stroke, which becomes thinner than one pixel at background-tile size. I
+       scaled the stroke to the viewBox instead so its weight stays predictable. -->
+  <path d="M0,447.7c0,0,379.9-4.6,376.9-222.2c-3-217.6-263.7-213.1-264.1,0c-0.4,213.1,323.7,225,399.1,222.2"
+        fill="none" stroke="#000" stroke-width="26" stroke-linecap="square"/>
+</svg>

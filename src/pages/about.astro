@@ -1,0 +1,206 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Band from '../components/Band.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import FactList from '../components/FactList.astro';
+import Illustration from '../components/Illustration.astro';
+import Flourish from '../components/Flourish.astro';
+import { Image } from 'astro:assets';
+import portrait from '../assets/people/starbie-profile-image.jpg';
+import { byOrder } from '../lib/content';
+
+async function page(id: string) {
+  const entry = await getEntry('pages', id);
+  return entry ? { entry, ...(await render(entry)) } : null;
+}
+
+const lore = await page('lore');
+const reference = await page('character-reference');
+const human = await page('form-human');
+const succubus = await page('form-succubus');
+const nox = await page('nocturne');
+const friends = (await getCollection('friends')).sort(byOrder);
+---
+
+<BaseLayout title="About" description="Starbie's profile, lore, and character references — plus the friends she streams with.">
+  <Band tone="lilac" divider="white">
+    <SectionHeading eyebrow="About me" title="Quick facts" hue="purple" as="h1" />
+    <div class="split">
+      <FactList />
+      <Illustration
+        class="portrait"
+        src={portrait}
+        alt="Starbie winking, with red and black hair, horns and pointed ears"
+        credit={{ name: 'Pep', role: 'Illustration', url: 'https://vgen.co/MatiosPepperoni' }}
+        widths={[320, 640]}
+        sizes="(max-width: 760px) 100vw, 320px"
+      />
+    </div>
+  </Band>
+
+  {lore && (
+    <Band tone="white" divider="sky" texture="grid">
+      <SectionHeading eyebrow="Where I came from" title={lore.entry.data.title} hue="terracotta" flourish />
+      <div class="split split--wide">
+        <div class="prose lore"><lore.Content /></div>
+        {lore.entry.data.image && (
+          <Illustration
+            src={lore.entry.data.image}
+            alt={lore.entry.data.imageAlt ?? ''}
+            credit={lore.entry.data.credit}
+            widths={[380, 760]}
+            sizes="(max-width: 760px) 100vw, 380px"
+          />
+        )}
+      </div>
+    </Band>
+  )}
+
+  <Band tone="sky" divider="white">
+    <SectionHeading eyebrow="Character references" title={reference?.entry.data.title ?? 'How to draw me'} hue="terracotta" flourish />
+
+    {reference?.entry.data.image && (
+      <Illustration
+        class="refsheet"
+        src={reference.entry.data.image}
+        alt={reference.entry.data.imageAlt ?? ''}
+        credit={reference.entry.data.credit}
+        widths={[600, 1000, 1600]}
+        sizes="(max-width: 1140px) 100vw, 1080px"
+      />
+    )}
+
+    <Flourish variant="stars" align="center" class="rule" />
+
+    <div class="forms">
+      {human && (
+        <div>
+          <h3>{human.entry.data.title}</h3>
+          <div class="prose"><human.Content /></div>
+        </div>
+      )}
+      {succubus && (
+        <div>
+          <h3>{succubus.entry.data.title}</h3>
+          <div class="prose"><succubus.Content /></div>
+        </div>
+      )}
+    </div>
+  </Band>
+
+  {nox && (
+    <Band tone="white" divider="blossom" texture="grid">
+      <SectionHeading eyebrow="My companion" title={nox.entry.data.title} hue="green" flourish />
+      <div class="split">
+        <div class="prose"><nox.Content /></div>
+        {nox.entry.data.image && (
+          <Illustration
+            src={nox.entry.data.image}
+            alt={nox.entry.data.imageAlt ?? ''}
+            credit={nox.entry.data.credit}
+            widths={[320, 640]}
+            sizes="(max-width: 760px) 100vw, 320px"
+          />
+        )}
+      </div>
+    </Band>
+  )}
+
+  {friends.length > 0 && (
+    <Band tone="blossom">
+      <SectionHeading eyebrow="Good company" title="Friends" hue="purple" flourish />
+      <ul class="friends">
+        {friends.map((f) => {
+          const Tag = f.data.url ? 'a' : 'div';
+          const link = f.data.url ? { href: f.data.url, target: '_blank', rel: 'noopener' } : {};
+          return (
+            <li style={`--hue:var(--c-${f.data.hue})`}>
+              <Tag class="friend" {...link}>
+                {f.data.avatar
+                  ? <Image class="face" src={f.data.avatar} alt="" widths={[144]} loading="lazy" />
+                  : <span class="face face--empty" aria-hidden="true">{f.data.name.charAt(0)}</span>}
+                <span class="name">{f.data.name}</span>
+              </Tag>
+            </li>
+          );
+        })}
+      </ul>
+    </Band>
+  )}
+</BaseLayout>
+
+<style>
+  .split { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
+  .portrait { width: min(100%, 320px); justify-self: center; }
+
+  @media (min-width: 760px) {
+    /* Pin the image track at 320px. An `auto` track follows the image's
+       intrinsic width and leaves too little room for the text. */
+    .split { grid-template-columns: minmax(0, 1fr) 320px; }
+    .split--wide { grid-template-columns: minmax(0, 1fr) 380px; align-items: start; }
+  }
+
+  .lore { font-size: clamp(1.02rem, 1rem + 0.25vw, 1.15rem); }
+
+  .refsheet { margin-bottom: 2rem; }
+  .rule { margin-bottom: 2rem; opacity: 0.55; }
+
+  .forms { display: grid; gap: clamp(2rem, 5vw, 3.5rem); }
+  .forms h3 { font-size: var(--size-block); margin-bottom: 0.75rem; }
+
+  @media (min-width: 760px) {
+    .forms { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* Fall back to an initial in a circle when a friend has no profile image. */
+  .friends {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(1.25rem, 3vw, 2.25rem);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .friends .friend {
+    display: grid;
+    justify-items: center;
+    gap: 0.6rem;
+    color: inherit;
+    text-decoration: none;
+    width: 6.5rem;
+  }
+
+  .friends .face {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius);
+    object-fit: cover;
+    border: 3px solid var(--color-line);
+    box-shadow: 0 4px 0 var(--hue);
+    background: var(--hue);
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .face--empty {
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.75rem;
+    color: var(--color-line);
+  }
+
+  .friends .friend:hover .face,
+  .friends .friend:focus-visible .face { transform: translateY(-3px); }
+
+  .friends .name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .friends a.friend:hover .name { text-decoration: underline; text-decoration-thickness: 0.14em; text-underline-offset: 0.16em; }
+</style>

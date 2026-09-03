@@ -1,0 +1,8 @@
+[
+  { "id": "name",     "order": 1, "label": "Name",      "value": "Starbie / Astaria",  "hue": "terracotta" },
+  { "id": "birthday", "order": 2, "label": "Birthday",  "value": "February 13th",      "hue": "orange" },
+  { "id": "species",  "order": 3, "label": "Species",   "value": "Celestial Succubus", "hue": "gold" },
+  { "id": "pronouns", "order": 4, "label": "Pronouns",  "value": "She / They",         "hue": "green" },
+  { "id": "oshi",     "order": 5, "label": "Oshi Mark", "value": "🌈⭐",                "hue": "teal" },
+  { "id": "fans",     "order": 6, "label": "Fan Name",  "value": "Starlings",          "hue": "purple" }
+]

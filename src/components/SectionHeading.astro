@@ -1,0 +1,66 @@
+---
+import type { Hue } from '../lib/hues';
+
+interface Props {
+  title: string;
+  eyebrow?: string;
+  hue?: Hue;
+  id?: string;
+  /** The first heading on a page should be the h1; the rest stay h2. */
+  as?: 'h1' | 'h2';
+  /**
+   * Wraps the title in the ˗ˏˋ ˎˊ˗ marks she types around her own headers.
+   * They are aria-hidden spans rather than part of the title text, so a screen
+   * reader announces “Lore” instead of a run of modifier letters.
+   */
+  flourish?: boolean;
+  /**
+   * Color for the ˗ˏˋ ˎˊ˗ marks. Any CSS color, or a token such as
+   * "var(--c-teal-deep)". Defaults to the band's --flourish-color.
+   */
+  flourishColor?: string;
+}
+const {
+  title,
+  eyebrow,
+  hue = 'purple',
+  id,
+  as: Tag = 'h2',
+  flourish = false,
+  flourishColor,
+} = Astro.props;
+---
+
+<div class="heading" id={id} style={flourishColor ? `--flourish-color:${flourishColor}` : undefined}>
+  {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+  <Tag>
+    {flourish && <span class="mark" aria-hidden="true">˗ˏˋ</span>}
+    {title}
+    {flourish && <span class="mark" aria-hidden="true">ˎˊ˗</span>}
+  </Tag>
+  <span class="rule" style={`background:var(--c-${hue}-deep)`} aria-hidden="true"></span>
+</div>
+
+<style>
+  .heading { margin-bottom: clamp(1.75rem, 3.5vw, 2.75rem); }
+  .heading :is(h1, h2) { font-size: var(--size-section); }
+
+  .mark {
+    color: var(--flourish-color);
+    font-weight: 400;
+    /* The marks sit high in their em box; nudge them onto the text baseline. */
+    display: inline-block;
+    transform: translateY(-0.12em);
+  }
+
+  .mark:first-child { margin-right: 0.35em; }
+  .mark:last-child { margin-left: 0.35em; }
+
+  .rule {
+    display: block;
+    width: 5.5rem;
+    height: 0.4rem;
+    margin-top: 0.7rem;
+    border-radius: var(--radius);
+  }
+</style>

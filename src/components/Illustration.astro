@@ -1,0 +1,40 @@
+---
+import { Image } from 'astro:assets';
+
+/**
+ * Keep the artwork and its attribution together. Credit is not optional
+ * styling; if an image has an artist listed, their name travels with it.
+ */
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  credit?: { name: string; role?: string; url?: string };
+  widths?: number[];
+  sizes?: string;
+  class?: string;
+}
+
+const { src, alt, credit, widths = [400, 800], sizes, class: className } = Astro.props;
+---
+
+<figure class:list={['illustration', className]}>
+  <Image src={src} alt={alt} widths={widths} sizes={sizes} loading="lazy" />
+  {credit && (
+    <figcaption>
+      {credit.role ?? 'Art'} by{' '}
+      {credit.url
+        ? <a href={credit.url} target="_blank" rel="noopener">{credit.name}</a>
+        : credit.name}
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  .illustration { margin: 0; display: grid; gap: 0.5rem; justify-items: start; }
+  .illustration img { display: block; width: 100%; height: auto; border-radius: 18px; }
+
+  figcaption {
+    font-size: var(--size-small);
+    color: var(--band-ink-soft, var(--color-ink-soft));
+  }
+</style>

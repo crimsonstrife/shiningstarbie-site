@@ -1,0 +1,44 @@
+[
+  {
+    "id": "twitch", "order": 1, "label": "Twitch",
+    "url": "https://www.twitch.tv/starbievt",
+    "icon": "fa6-brands:twitch", "hue": "purple", "primary": true,
+    "blurb": "Where I go live — PVP and nostalgic games."
+  },
+  {
+    "id": "youtube", "order": 2, "label": "YouTube",
+    "url": "https://www.youtube.com/@shining.starbie",
+    "icon": "fa6-brands:youtube", "hue": "pink", "primary": true,
+    "blurb": "VODs, music, and longer-form uploads."
+  },
+  {
+    "id": "discord", "order": 3, "label": "Discord",
+    "url": "https://discord.gg/Ws2Ger6gFQ",
+    "icon": "fa6-brands:discord", "hue": "teal", "primary": true,
+    "blurb": "The Starlings server — come say hi."
+  },
+  {
+    "id": "x", "order": 4, "label": "X",
+    "url": "https://x.com/starbievt",
+    "icon": "fa6-brands:x-twitter", "hue": "terracotta", "primary": true,
+    "blurb": "Go-live posts, art, and general chatter."
+  },
+  {
+    "id": "tiktok", "order": 5, "label": "TikTok",
+    "url": "https://www.tiktok.com/@starbievt",
+    "icon": "fa6-brands:tiktok", "hue": "green",
+    "blurb": "Clips and short-form silliness."
+  },
+  {
+    "id": "instagram", "order": 6, "label": "Instagram",
+    "url": "https://www.instagram.com/starbievt/",
+    "icon": "fa6-brands:instagram", "hue": "orange",
+    "blurb": "Art posts and stream photos."
+  },
+  {
+    "id": "vgen", "order": 7, "label": "VGen",
+    "url": "https://vgen.co/starbie",
+    "icon": "fa6-solid:palette", "hue": "gold",
+    "blurb": "Commission me for art, music, or sound design."
+  }
+]

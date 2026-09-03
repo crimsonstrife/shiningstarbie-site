@@ -1,0 +1,6 @@
+[
+  { "id": "general", "order": 1, "tag": "#shiningstarbie",  "purpose": "General posts and everything else", "hue": "purple" },
+  { "id": "fanart",  "order": 2, "tag": "#starbiescribbles", "purpose": "Fan art — tag me and I'll see it",  "hue": "pink" },
+  { "id": "clips",   "order": 3, "tag": "#starbloops",       "purpose": "Stream clips and highlights",        "hue": "teal" },
+  { "id": "nsfw",    "order": 4, "tag": "#starbiesinfuls",   "purpose": "Adult fan art, off-site only",       "hue": "terracotta", "adult": true }
+]

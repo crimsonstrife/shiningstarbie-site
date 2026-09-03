@@ -1,0 +1,26 @@
+[
+  {
+    "id": "merch", "order": 1, "label": "Merch store", "kind": "merch",
+    "url": "https://shiningstarbie-shop.fourthwall.com/",
+    "icon": "fa6-solid:bag-shopping", "hue": "pink",
+    "blurb": "Apparel, prints, and accessories over on Fourthwall."
+  },
+  {
+    "id": "throne", "order": 2, "label": "Throne wishlist", "kind": "wishlist",
+    "url": "https://throne.com/starbievt",
+    "icon": "fa6-solid:gift", "hue": "purple",
+    "blurb": "If you'd like to send something, it's all here."
+  },
+  {
+    "id": "dubby", "order": 3, "label": "Dubby Energy", "kind": "sponsor",
+    "url": "https://www.dubby.gg/discount/STARBIEVT?ref=yotnylxg",
+    "icon": "fa6-solid:mug-hot", "hue": "teal", "code": "StarbieVT",
+    "blurb": "My energy sponsor — 10% off with my code."
+  },
+  {
+    "id": "pobox", "order": 4, "label": "PO Box", "kind": "mail",
+    "icon": "fa6-solid:envelope", "hue": "gold",
+    "blurb": "Fan mail is always welcome. Please don't send perishables.",
+    "address": ["StarbieVT", "PO Box 5203", "Salem, OR, 97304"]
+  }
+]

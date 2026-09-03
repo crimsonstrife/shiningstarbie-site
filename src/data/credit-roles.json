@@ -1,0 +1,10 @@
+[
+  { "id": "live2d",       "order": 1, "label": "Live2D model & rigging" },
+  { "id": "illustration", "order": 2, "label": "Illustration" },
+  { "id": "overlays",     "order": 3, "label": "Overlays & screens" },
+  { "id": "animation",    "order": 4, "label": "Animation" },
+  { "id": "emotes",       "order": 5, "label": "Emotes" },
+  { "id": "editing",      "order": 6, "label": "Video editing" },
+  { "id": "management",   "order": 7, "label": "Management" },
+  { "id": "web",          "order": 8, "label": "This website" }
+]

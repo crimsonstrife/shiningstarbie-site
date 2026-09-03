@@ -1,0 +1,20 @@
+{
+  "name": "starbie",
+  "nameWithMark": "starbie🌈⭐",
+  "oshiMark": "🌈⭐",
+  "fanName": "Starlings",
+  "title": "starbie🌈⭐ — VTuber, artist, composer, sound designer",
+  "tagline": "Let's shoot for the stars together!~",
+  "description": "starbie is a Celestial Succubus VTuber who streams PVP and nostalgic games on Twitch — and an artist, music composer, and sound designer. Links, merch, art, and credits.",
+  "locale": "en",
+  "copyrightStartYear": 2023,
+  "businessEmail": "",
+  "nav": [
+    { "label": "Home", "href": "/" },
+    { "label": "About", "href": "/about" },
+    { "label": "Works", "href": "/works" },
+    { "label": "Links", "href": "/links" },
+    { "label": "Support", "href": "/support" },
+    { "label": "Credits", "href": "/credits" }
+  ]
+}

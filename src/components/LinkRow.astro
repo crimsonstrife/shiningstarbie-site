@@ -1,0 +1,114 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { Hue } from '../lib/hues';
+
+/**
+ * A full-width link row. Its hue appears in the left rule and hover wash; the
+ * label stays ink because the bright brand colors do not clear AA as text.
+ */
+interface Props {
+  href?: string;
+  label: string;
+  icon: string;
+  hue: Hue;
+  blurb?: string;
+  meta?: string;
+  external?: boolean;
+}
+const { href, label, icon, hue, blurb, meta, external = true } = Astro.props;
+const Tag = href ? 'a' : 'div';
+const linkAttrs = href && external ? { target: '_blank', rel: 'noopener' } : {};
+---
+
+<Tag
+  class:list={['row', { 'row--static': !href }]}
+  href={href}
+  {...linkAttrs}
+  style={`--hue:var(--c-${hue});--hue-deep:var(--c-${hue}-deep)`}
+>
+  <span class="icon" aria-hidden="true"><Icon name={icon} /></span>
+
+  <span class="text">
+    <span class="label">{label}</span>
+    {blurb && <span class="blurb">{blurb}</span>}
+  </span>
+
+  {meta && <span class="meta">{meta}</span>}
+  {href && <span class="chev" aria-hidden="true"><Icon name="fa6-solid:arrow-right" /></span>}
+</Tag>
+
+<style>
+  .row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+    padding: 1rem clamp(0.75rem, 2vw, 1.25rem);
+    border-bottom: 2px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+    color: inherit;
+    text-decoration: none;
+    overflow: hidden;
+  }
+
+  .row::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: var(--hue);
+    border-radius: var(--radius);
+  }
+
+  /* The wash starts at the rule, so hovering does not turn the row into a box. */
+  .row::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--hue) 30%, transparent), transparent 65%);
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease);
+    pointer-events: none;
+  }
+
+  .row:hover::after,
+  .row:focus-visible::after { opacity: 1; }
+
+  .icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 44px; height: 44px;
+    border-radius: var(--radius);
+    background: var(--hue);
+    color: var(--color-line);
+    font-size: 1.15rem;
+  }
+
+  .text { display: grid; gap: 0.1rem; flex: 1 1 auto; min-width: 0; }
+
+  .label { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; }
+  .blurb { font-size: var(--size-small); color: var(--band-ink-soft, var(--color-ink-soft)); }
+
+  .meta {
+    flex: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--size-small);
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--radius);
+    background: var(--color-line);
+    color: #fff;
+  }
+
+  .chev { flex: none; opacity: 0.55; transition: transform var(--dur) var(--ease); }
+  .row:hover .chev { transform: translateX(4px); }
+  .row--static { cursor: default; }
+
+  @media (max-width: 560px) {
+    .chev { display: none; }
+
+    /* The badge crowds the blurb at this width; give it its own line. */
+    .row { flex-wrap: wrap; }
+    .meta { margin-left: calc(44px + clamp(0.75rem, 2vw, 1.25rem)); }
+  }
+</style>

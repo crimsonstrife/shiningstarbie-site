@@ -1,0 +1,168 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/starbie-logo.png';
+import site from '../data/site.json';
+import { href } from '../lib/urls';
+
+const path = Astro.url.pathname;
+const isCurrent = (itemHref: string) =>
+  itemHref.endsWith('/') ? path === itemHref : path === itemHref || path.startsWith(`${itemHref}/`);
+---
+
+<header class="header">
+  <div class="wrap bar">
+    <a class="brand" href={href('/')} aria-label={`${site.name} — home`}>
+      <Image src={logo} alt="" widths={[220]} loading="eager" />
+    </a>
+
+    <button class="toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="toggle__bars" aria-hidden="true"></span>
+      <span class="sr">Menu</span>
+    </button>
+
+    <nav id="site-nav" class="nav" aria-label="Main">
+      <ul>
+        {site.nav.map((item, i) => {
+          const itemHref = href(item.href);
+          return (
+            <li>
+              <a
+                href={itemHref}
+                aria-current={isCurrent(itemHref) ? 'page' : undefined}
+                style={`--dot:var(--c-${['terracotta','orange','gold','green','teal','purple'][i % 6]})`}
+              >{item.label}</a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.toggle');
+  const header = document.querySelector<HTMLElement>('.header');
+  toggle?.addEventListener('click', () => {
+    const open = header?.classList.toggle('is-open') ?? false;
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+  // Close the panel after a link is tapped. Browsers that restore scroll
+  // position may otherwise leave the menu open behind the newly loaded page.
+  document.querySelectorAll('.nav a').forEach((a) =>
+    a.addEventListener('click', () => {
+      header?.classList.remove('is-open');
+      toggle?.setAttribute('aria-expanded', 'false');
+    })
+  );
+</script>
+
+<style>
+  .header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 100;
+    background: color-mix(in srgb, var(--color-cloud) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 3px solid var(--color-rule);
+  }
+
+  .bar {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .brand { display: flex; align-items: center; line-height: 0; }
+  .brand img { height: 42px; width: auto; }
+
+  .nav ul {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.5rem, 1.6vw, 1.6rem);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav a {
+    position: relative;
+    display: block;
+    padding: 0.45rem 0.2rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+
+  /* Put the spectrum color in the underline. The label stays ink because it
+     is the only option here that reliably clears contrast at this size. */
+  .nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.15rem;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--dot);
+    transform: scaleX(0);
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .nav a:hover::after,
+  .nav a:focus-visible::after,
+  .nav a[aria-current='page']::after { transform: scaleX(1); }
+
+  .toggle { display: none; }
+
+  .sr {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+
+  @media (max-width: 780px) {
+    .toggle {
+      display: grid;
+      place-items: center;
+      width: 44px; height: 44px;
+      background: none;
+      border: 3px solid var(--color-ink);
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .toggle__bars,
+    .toggle__bars::before,
+    .toggle__bars::after {
+      display: block;
+      width: 20px; height: 3px;
+      border-radius: 3px;
+      background: var(--color-ink);
+    }
+
+    .toggle__bars { position: relative; }
+    .toggle__bars::before,
+    .toggle__bars::after { content: ''; position: absolute; left: 0; }
+    .toggle__bars::before { top: -6px; }
+    .toggle__bars::after { top: 6px; }
+
+    .nav {
+      position: absolute;
+      inset: var(--header-height) 0 auto;
+      background: var(--color-cloud);
+      border-bottom: 3px solid var(--color-rule);
+      display: none;
+    }
+
+    .header.is-open .nav { display: block; }
+
+    .nav ul { flex-direction: column; align-items: stretch; gap: 0; padding: 0.5rem var(--gutter) 1rem; }
+    .nav a { padding: 0.7rem 0; font-size: 1.15rem; }
+    .nav a::after { bottom: 0.45rem; }
+  }
+</style>

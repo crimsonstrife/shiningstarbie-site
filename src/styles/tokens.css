@@ -1,0 +1,129 @@
+/*
+ * starbie's color tokens.
+ *
+ * I use two palettes because the light and dark colors have different jobs:
+ *
+ *   Sticker pastels — the confetti, star, and cloud set from her overlays.
+ *   These are for surfaces and decoration. None has enough contrast for text.
+ *
+ *   Logo spectrum — the deeper letter colors from the “starbie” wordmark.
+ *   The bright values are also decoration. Each has a `-deep` version: the
+ *   darkest value of the same hue that clears 5:1 on white. Only that version
+ *   is used for link or label text.
+ *
+ * Measured, not eyeballed. Every ratio below was computed against the WCAG
+ * relative-luminance formula:
+ *
+ *   - No bright brand color passes AA on white. The worst is gold at 1.77:1,
+ *     the best is purple at 3.99:1. This is why `-deep` exists at all.
+ *   - Ink clears AA on all seven pastels (worst case 5.49:1, on purple), so on
+ *     a colored band the text color is always ink. No exceptions.
+ *   - The deep spectrum does NOT clear AA on the pastels (purple bottoms out
+ *     at 1.78:1). So a link on a colored band is ink plus a bright underline:
+ *     the color reads, the contrast still holds.
+ *
+ * When adding something, put color in the background, rule, or underline.
+ * Keep text on top of color in ink, or it will generally miss AA contrast.
+ */
+
+:root {
+  /* --- Sticker pastels — surfaces and decoration only ---------------- */
+  --c-yellow: #f8d858;
+  --c-lavender: #b890f0;
+  --c-sky: #70c0f0;
+  --c-mint: #78e0d0;
+  --c-blossom: #e898c0;
+  --c-baby: #a8d0f8;
+  --c-lilac: #d8c0f8;
+
+  /* --- Logo spectrum, bright — decoration, rules, underlines --------- */
+  --c-terracotta: #c87050;
+  --c-orange: #e09860;
+  --c-gold: #e0c060;
+  --c-green: #98c070;
+  --c-teal: #70b8c0;
+  --c-purple: #9070c0;
+  --c-pink: #e88090;
+
+  /* --- Logo spectrum, deep — text and links, on WHITE only ----------- */
+  --c-terracotta-deep: #ae5637;
+  --c-orange-deep: #a75c21;
+  --c-gold-deep: #876c1a;
+  --c-green-deep: #577936;
+  --c-teal-deep: #38787f;
+  --c-purple-deep: #815db8;
+  --c-pink-deep: #d52741;
+
+  /* --- Neutrals ----------------------------------------------------- */
+  --color-ink: #2e2a3a;
+  --color-ink-soft: #5a5470;
+  --color-line: #1a1a1a;
+  --color-cloud: #ffffff;
+  --color-surface: #fffdfa;
+  --color-surface-sunk: #f6f2fb;
+  --color-rule: #e6dff2;
+
+  /* --- Semantic ----------------------------------------------------- */
+  --color-accent: var(--c-purple-deep);
+  --color-accent-bright: var(--c-purple);
+  --color-link: var(--c-purple-deep);
+
+  /* Set per-band by the Band component; defaults suit a white section. */
+  --band-bg: var(--color-surface);
+  --band-ink: var(--color-ink);
+  --band-ink-soft: var(--color-ink-soft);
+
+  /* --- Type --------------------------------------------------------- */
+  --font-display: 'Baloo 2 Variable', 'Baloo 2', 'Trebuchet MS', sans-serif;
+  --font-body: 'Nunito Variable', 'Nunito', 'Segoe UI', system-ui, sans-serif;
+
+  --size-hero: clamp(2.5rem, 1.4rem + 5vw, 5rem);
+  --size-section: clamp(1.9rem, 1.35rem + 2.4vw, 3rem);
+  --size-block: clamp(1.15rem, 1rem + 0.6vw, 1.4rem);
+  --size-body: clamp(1rem, 0.97rem + 0.15vw, 1.09rem);
+  --size-small: 0.875rem;
+
+  --leading-body: 1.7;
+  --tracking-label: 0.08em;
+
+  /* --- Layout ------------------------------------------------------- */
+  --header-height: 68px;
+  --container: 1140px;
+  --container-narrow: 760px;
+  --gutter: clamp(1.1rem, 4vw, 2.5rem);
+  --band-pad: clamp(3.5rem, 7vw, 6rem);
+  --radius: 999px;
+
+  /* --- Background textures ------------------------------------------ */
+  --grid-color: #ffe07a;
+  --grid-size: 80px;
+  --grid-line: 1.5px;
+  --grid-opacity: 0.35;
+
+  --stars-tile: 200px;
+  --stars-opacity: 0.55;
+
+  /*
+   * Her pink flourishes — the star divider and the looping header line.
+   *
+   * The soft pink measures 9.6:1 on the dark footer and only 1.1–1.8:1 on the
+   * light bands, which is close enough to invisible. Pink is therefore the
+   * default for a dark background, and Band swaps in the deep value. That is
+   * the same hue, darkened until it clears 3:1 on the worst band (lavender,
+   * 3.01:1).
+   *
+   * Override per heading with <SectionHeading flourishColor="..." />, or
+   * anywhere by setting --flourish-color on a wrapper.
+   */
+  --flourish-color: #ffa6c6;
+  --flourish-color-deep: #a9003d;
+
+  /* --- Motion ------------------------------------------------------- */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 150ms;
+  --dur: 280ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-fast: 0ms; --dur: 0ms; }
+}

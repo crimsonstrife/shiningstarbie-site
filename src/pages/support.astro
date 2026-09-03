@@ -1,0 +1,82 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Band from '../components/Band.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import LinkRow from '../components/LinkRow.astro';
+import merchArt from '../assets/brand/starbie-merch-graphic.png';
+import poBoxArt from '../assets/brand/starbie-po-box-image.png';
+import { byOrder } from '../lib/content';
+
+const all = (await getCollection('support')).sort(byOrder);
+const links = all.filter((s) => s.data.kind !== 'mail');
+const mail = all.filter((s) => s.data.kind === 'mail');
+---
+
+<BaseLayout title="Support" description="Merch, wishlist, sponsor codes, and the PO box — all the ways to support me.">
+  <Band tone="yellow" divider="white">
+    <SectionHeading eyebrow="Thank you, honestly" title="Support" hue="terracotta" as="h1" />
+    <div class="intro measure">
+      <p>Everything here is optional and always will be. Watching the streams and hanging out in chat is support too!</p>
+      <Image class="art" src={merchArt} alt="" widths={[240]} loading="eager" />
+    </div>
+  </Band>
+
+  <Band tone="white" divider="blossom" texture="grid">
+    <div class="rows measure">
+      {links.map((s) => (
+        <LinkRow
+          href={s.data.url}
+          label={s.data.label}
+          icon={s.data.icon}
+          hue={s.data.hue}
+          blurb={s.data.blurb}
+          meta={s.data.code ? `Code: ${s.data.code}` : undefined}
+        />
+      ))}
+    </div>
+  </Band>
+
+  {mail.map((m) => (
+    <Band tone="blossom">
+      <SectionHeading eyebrow="Fan mail" title={m.data.label} hue="gold" flourish />
+      <div class="mail measure">
+        <address>
+          {m.data.address?.map((line) => <span>{line}</span>)}
+        </address>
+        <Image class="art" src={poBoxArt} alt="" widths={[240]} loading="lazy" />
+      </div>
+      <p class="note">{m.data.blurb}</p>
+    </Band>
+  ))}
+</BaseLayout>
+
+<style>
+  .rows { display: grid; }
+
+  .intro { display: grid; gap: 1.5rem; align-items: center; }
+  .intro p { font-size: 1.1rem; }
+  .art { width: 100%; max-width: 220px; justify-self: center; }
+
+  @media (min-width: 700px) {
+    .intro { grid-template-columns: minmax(0, 1fr) 220px; }
+  }
+
+  .mail { display: grid; gap: 1.5rem; align-items: center; }
+
+  address {
+    font-style: normal;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.5rem);
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  @media (min-width: 700px) {
+    .mail { grid-template-columns: minmax(0, 1fr) 220px; }
+  }
+
+  .note { margin-top: 1.25rem; font-size: var(--size-small); color: var(--band-ink-soft); }
+</style>

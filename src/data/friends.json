@@ -1,0 +1,28 @@
+[
+  {
+    "id": "juno",
+    "order": 1,
+    "name": "Juno",
+    "url": "https://www.twitch.tv/butterfly_juno",
+    "hue": "purple",
+    "blurb": "",
+    "avatar": "../assets/people/juno-profile-image.jpg"
+  },
+  {
+    "id": "iota",
+    "order": 2,
+    "name": "Iota",
+    "url": "https://www.twitch.tv/simplyiota",
+    "hue": "teal",
+    "blurb": "",
+    "avatar": "../assets/people/iota-profile-image.png"
+  },
+  {
+    "id": "stu",
+    "order": 3,
+    "name": "Stu",
+    "hue": "orange",
+    "blurb": "",
+    "avatar": "../assets/people/stu-profile-image.jpg"
+  }
+]

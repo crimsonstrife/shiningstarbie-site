@@ -1,0 +1,79 @@
+---
+import { Icon } from 'astro-icon/components';
+import Flourish from './Flourish.astro';
+import { getCollection } from 'astro:content';
+import { byOrder } from '../lib/content';
+import site from '../data/site.json';
+
+const socials = (await getCollection('socials')).sort(byOrder);
+const year = new Date().getFullYear();
+const years = year > site.copyrightStartYear ? `${site.copyrightStartYear}–${year}` : `${year}`;
+---
+
+<footer class="footer">
+  <Flourish variant="loops" class="footer__rule" />
+
+  <div class="wrap inner">
+    <p class="mark">{site.nameWithMark}</p>
+
+    <ul class="icons">
+      {socials.map((s) => (
+        <li>
+          <a href={s.data.url} rel="me noopener" target="_blank" aria-label={s.data.label}>
+            <Icon name={s.data.icon} />
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <p class="small">
+      © {years} {site.name}. Site made with ♥ by <a href="https://vgen.co/crimsonstrife">CrimsonStrife</a>.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    background: var(--color-line);
+    color: #fff;
+    padding-block: clamp(3.25rem, 6vw, 4.25rem) clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  /* Her looping header/footer line, sitting just inside the top edge. */
+  .footer__rule {
+    position: absolute;
+    inset: 0.9rem 0 auto;
+  }
+
+  .inner { display: grid; gap: 1.25rem; justify-items: center; text-align: center; }
+
+  .mark { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; }
+
+  .icons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .icons a {
+    display: grid;
+    place-items: center;
+    width: 44px; height: 44px;
+    border-radius: var(--radius);
+    color: #fff;
+    font-size: 1.15rem;
+    transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+
+  .icons a:hover { background: rgba(255, 255, 255, 0.16); transform: translateY(-2px); }
+
+  .small { font-size: var(--size-small); color: rgba(255, 255, 255, 0.78); }
+  .small a { color: #fff; }
+
+  :where(.footer a):focus-visible { outline-color: #fff; }
+</style>

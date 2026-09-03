@@ -1,0 +1,90 @@
+---
+import '@fontsource-variable/baloo-2';
+import '@fontsource-variable/nunito';
+import '../styles/global.css';
+
+import { getCollection } from 'astro:content';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import site from '../data/site.json';
+import { href } from '../lib/urls';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Social preview image; falls back to the site card. */
+  image?: string;
+  ogType?: 'website' | 'profile' | 'article';
+}
+
+const { title, description = site.description, image, ogType = 'website' } = Astro.props;
+
+const pageTitle = title ? `${title} — ${site.nameWithMark}` : site.title;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+// Keep this absolute. Most link-preview services drop a relative og:image URL,
+// leaving the shared link with a grey box instead of the site card.
+const ogImage = new URL(href(image ?? '/og-default.png'), Astro.site);
+
+// Public files are not rewritten by Astro. Defining their URLs here keeps the
+// CSS readable and gives every component the same deployment base.
+const publicAssetUrls = [
+  `--image-falling-stars:url("${href('/falling-stars.gif')}")`,
+  `--image-falling-stars-still:url("${href('/falling-stars-still.png')}")`,
+  `--image-flourish-stars:url("${href('/flourish-stars.svg')}")`,
+  `--image-flourish-loops:url("${href('/flourish-loops.svg')}")`,
+].join(';');
+
+const socials = await getCollection('socials');
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  alternateName: 'StarbieVT',
+  description: site.description,
+  url: new URL(href('/'), Astro.site).href,
+  sameAs: socials.map((s) => s.data.url),
+};
+---
+
+<!doctype html>
+<html lang={site.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={href('/favicon-32.png')} sizes="32x32" type="image/png" />
+    <link rel="icon" href={href('/favicon-64.png')} sizes="64x64" type="image/png" />
+    <link rel="apple-touch-icon" href={href('/apple-touch-icon.png')} />
+    <link rel="sitemap" href={href('/sitemap-index.xml')} />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <meta name="generator" content={Astro.generator} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+  </head>
+
+  <body style={publicAssetUrls}>
+    <a class="skip" href="#main">Skip to content</a>
+    <SiteHeader />
+    <main id="main"><slot /></main>
+    <SiteFooter />
+  </body>
+</html>
+
+<style>
+  main { padding-top: var(--header-height); }
+</style>

@@ -1,0 +1,12 @@
+{
+  "//": "Astro writes one JSON Schema per collection into .astro/collections/. These mappings give the data files autocomplete and inline checks. Run `npm run dev` once after cloning, since the generated schemas do not exist before that.",
+  "json.schemas": [
+    { "fileMatch": ["/src/data/socials.json"], "url": "./.astro/collections/socials.schema.json" },
+    { "fileMatch": ["/src/data/support.json"], "url": "./.astro/collections/support.schema.json" },
+    { "fileMatch": ["/src/data/credits.json"], "url": "./.astro/collections/credits.schema.json" },
+    { "fileMatch": ["/src/data/credit-roles.json"], "url": "./.astro/collections/creditRoles.schema.json" },
+    { "fileMatch": ["/src/data/friends.json"], "url": "./.astro/collections/friends.schema.json" },
+    { "fileMatch": ["/src/data/hashtags.json"], "url": "./.astro/collections/hashtags.schema.json" },
+    { "fileMatch": ["/src/data/profile.json"], "url": "./.astro/collections/profile.schema.json" }
+  ]
+}

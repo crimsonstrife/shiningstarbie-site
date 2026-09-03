@@ -1,0 +1,94 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Band from '../components/Band.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import { byOrder } from '../lib/content';
+import { hueAt } from '../lib/hues';
+
+const roles = (await getCollection('creditRoles')).sort(byOrder);
+const people = await getCollection('credits');
+
+/**
+ * I kept this as a plain roster. Thirty-one contributors in thirty-one little
+ * boxes would be harder to scan and would turn the page into another card grid.
+ */
+const groups = roles
+  .map((role) => ({
+    role,
+    members: people
+      .filter((p) => p.data.role === role.id)
+      .sort((a, b) => a.data.name.localeCompare(b.data.name)),
+  }))
+  .filter((g) => g.members.length > 0);
+---
+
+<BaseLayout title="Credits" description="The artists, riggers, animators, editors, and managers behind starbie.">
+  <Band tone="lavender" divider="white">
+    <SectionHeading eyebrow="None of this was solo" title="Credits" hue="gold" as="h1" />
+    <p class="intro">
+      Some of the stuff (models, overlays, emotes, and animations) here were made by someone else. This page is the whole list.
+    </p>
+  </Band>
+
+  <Band tone="white" texture="grid">
+    <div class="roster measure">
+      {groups.map((group, i) => (
+        <section class="group" style={`--hue:var(--c-${hueAt(i)});--hue-deep:var(--c-${hueAt(i)}-deep)`}>
+          <h2>{group.role.data.label}</h2>
+          <ul>
+            {group.members.map((p) => (
+              <li>
+                {p.data.avatar && (
+                  <Image class="face" src={p.data.avatar} alt="" widths={[64]} loading="lazy" />
+                )}
+                {p.data.url
+                  ? <a href={p.data.url} target="_blank" rel="noopener">{p.data.name}</a>
+                  : <span>{p.data.name}</span>}
+                {p.data.note && <span class="note"> — {p.data.note}</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </Band>
+</BaseLayout>
+
+<style>
+  .intro { font-size: 1.1rem; max-width: 46ch; }
+
+  .roster { display: grid; gap: clamp(2rem, 4vw, 2.75rem); }
+
+  .group { padding-left: 1.25rem; border-left: 6px solid var(--hue); }
+
+  .group h2 {
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-label);
+    color: var(--hue-deep);
+    margin-bottom: 0.6rem;
+  }
+
+  .group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.4rem;
+    font-size: 1.05rem;
+  }
+
+  .group li { font-family: var(--font-display); font-weight: 700; display: flex; align-items: center; gap: 0.45rem; }
+
+  .face {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius);
+    object-fit: cover;
+    border: 2px solid var(--color-line);
+  }
+  .note { font-family: var(--font-body); font-weight: 400; color: var(--color-ink-soft); }
+</style>

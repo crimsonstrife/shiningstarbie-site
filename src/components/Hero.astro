@@ -1,0 +1,104 @@
+---
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+import { getCollection, getEntry, render } from 'astro:content';
+import logo from '../assets/brand/starbie-logo.png';
+import site from '../data/site.json';
+import { byOrder } from '../lib/content';
+
+const intro = await getEntry('pages', 'intro');
+const { Content } = intro ? await render(intro) : { Content: null };
+const primary = (await getCollection('socials')).filter((s) => s.data.primary).sort(byOrder);
+---
+
+<section class="hero">
+  <div class="stars" aria-hidden="true"></div>
+
+  <div class="wrap inner">
+    <h1 class="logo-heading">
+      <Image class="logo" src={logo} alt={`${site.name} — VTuber, artist, composer, sound designer`} widths={[520, 900]} loading="eager" />
+    </h1>
+
+    <div class="blurb prose">{Content && <Content />}</div>
+
+    <ul class="quick">
+      {primary.map((s) => (
+        <li>
+          <a href={s.data.url} target="_blank" rel="noopener" style={`--hue:var(--c-${s.data.hue})`}>
+            <Icon name={s.data.icon} aria-hidden="true" />
+            <span>{s.data.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <svg class="cloud" viewBox="0 0 1200 64" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <path
+      style="fill:var(--c-lilac)"
+      d="M0,64 L0,34 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 a60,30 0 0,1 120,0 L1200,64 Z"
+    />
+  </svg>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding-block: clamp(3rem, 7vw, 5.5rem) calc(clamp(3rem, 7vw, 5.5rem) + 64px);
+    background:
+      radial-gradient(circle at 18% 20%, color-mix(in srgb, var(--c-baby) 55%, transparent), transparent 55%),
+      radial-gradient(circle at 82% 30%, color-mix(in srgb, var(--c-blossom) 45%, transparent), transparent 55%),
+      var(--color-surface);
+  }
+
+  /* Her Carrd's falling-star loop. The edges match at its native 200px, and
+     the alpha channel lets the gradient show through. It is decorative, so it
+     stays out of the accessibility tree, ignores pointer input, and switches
+     to a still frame when the visitor asks for reduced motion. */
+  .stars {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: var(--stars-opacity);
+    background: var(--image-falling-stars) repeat 0 0 / var(--stars-tile) var(--stars-tile);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stars { background-image: var(--image-falling-stars-still); }
+  }
+
+  .inner { position: relative; z-index: 1; display: grid; justify-items: center; text-align: center; gap: 1.5rem; }
+
+  .logo-heading { margin: 0; line-height: 0; }
+  .logo { width: min(100%, 520px); height: auto; }
+
+  .blurb {
+    max-width: 46ch;
+    font-size: clamp(1.05rem, 1rem + 0.4vw, 1.25rem);
+  }
+
+  .quick { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; list-style: none; margin: 0; padding: 0; }
+
+  .quick a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.65rem 1.35rem;
+    border-radius: var(--radius);
+    background: var(--hue);
+    border: 3px solid var(--color-line);
+    box-shadow: 0 4px 0 var(--color-line);
+    color: var(--color-line);
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+  }
+
+  .quick a:hover,
+  .quick a:focus-visible { transform: translateY(-3px); box-shadow: 0 7px 0 var(--color-line); }
+  .quick a:active { transform: translateY(1px); box-shadow: 0 2px 0 var(--color-line); }
+
+  .cloud { position: absolute; left: 0; bottom: -1px; width: 100%; height: 64px; }
+</style>

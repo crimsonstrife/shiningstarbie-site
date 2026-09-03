@@ -1,0 +1,84 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Band from '../components/Band.astro';
+import Hero from '../components/Hero.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import FactList from '../components/FactList.astro';
+import LinkRow from '../components/LinkRow.astro';
+import WorkMedia from '../components/WorkMedia.astro';
+import { byOrder, byDate, includeDrafts } from '../lib/content';
+import { href } from '../lib/urls';
+
+const support = (await getCollection('support')).sort(byOrder).slice(0, 3);
+const featured = (await getCollection('works', ({ data }) => includeDrafts || !data.draft))
+  .filter((w) => w.data.featured)
+  .sort(byDate)
+  .slice(0, 3);
+---
+
+<BaseLayout ogType="profile">
+  <Hero />
+
+  <Band tone="lilac" divider="mint" id="about">
+    <SectionHeading eyebrow="Nice to meet you" title="A little about me" hue="purple" flourish />
+    <FactList />
+    <p class="more"><a href={href('/about')}>Read the full lore and character refs →</a></p>
+  </Band>
+
+  {featured.length > 0 && (
+    <Band tone="white" divider="mint" texture="grid">
+      <SectionHeading eyebrow="Things I've made" title="Selected works" hue="pink" flourish />
+      <ul class="works">
+        {featured.map((w) => (
+          <li>
+            <a href={href(`/works/${w.id}`)}>
+              <WorkMedia media={w.data.media} title={w.data.title} />
+              <span class="works__title">{w.data.title}</span>
+              {w.data.summary && <span class="works__summary">{w.data.summary}</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="more"><a href={href('/works')}>See everything →</a></p>
+    </Band>
+  )}
+
+  <Band tone="mint" divider="white">
+    <SectionHeading eyebrow="If you'd like to help out" title="Support" hue="purple" flourish />
+    <div class="rows measure">
+      {support.map((s) => (
+        <LinkRow
+          href={s.data.url}
+          label={s.data.label}
+          icon={s.data.icon}
+          hue={s.data.hue}
+          blurb={s.data.blurb}
+          meta={s.data.code ? `Code: ${s.data.code}` : undefined}
+          external={Boolean(s.data.url)}
+        />
+      ))}
+    </div>
+    <p class="more"><a href={href('/support')}>All the ways to support →</a></p>
+  </Band>
+</BaseLayout>
+
+<style>
+  .more { margin-top: 1.75rem; font-family: var(--font-display); font-weight: 700; }
+
+  .rows { display: grid; }
+
+  .works {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .works a { display: grid; gap: 0.55rem; color: inherit; text-decoration: none; }
+  .works__title { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; }
+  .works__summary { font-size: var(--size-small); color: var(--band-ink-soft); }
+  .works a:hover .works__title { text-decoration: underline; text-decoration-thickness: 0.14em; text-underline-offset: 0.16em; }
+</style>
