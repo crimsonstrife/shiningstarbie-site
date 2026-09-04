@@ -1,0 +1,33 @@
+[
+  {
+    "id": "default",
+    "line": "That page doesn't exist — it may have moved, or the link might be a little old."
+  },
+  {
+    "id": "nox-ate-it",
+    "line": "Nox ate it. He's not sorry.",
+    "image": "../assets/art/nocturne-chibi.png",
+    "imageAlt": "Nox, a round black wyvern with big purple eyes and his rainbow tongue sticking out",
+    "credit": { "name": "Starbie", "role": "Illustration", "url": "https://vgen.co/starbie" }
+  },
+  {
+    "id": "shooting-star",
+    "line": "This page took off like a shooting star. Nox is a little jealous."
+  },
+  {
+    "id": "wrong-constellation",
+    "line": "Wrong constellation, Starling. Happens to the best of us."
+  },
+  {
+    "id": "old-link",
+    "line": "That link might be older than my current rig."
+  },
+  {
+    "id": "looked-twice",
+    "line": "I looked everywhere for it. Twice."
+  },
+  {
+    "id": "dr-pepper",
+    "line": "If you're reading this, bring me a Dr. Pepper."
+  }
+]

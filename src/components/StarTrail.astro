@@ -1,0 +1,165 @@
+---
+import { hueAt } from '../lib/hues';
+import { href } from '../lib/urls';
+import site from '../data/site.json';
+
+/**
+ * This puts the site's routes along a curved trail of stars on the 404 page.
+ *
+ * It reads the same `nav` list as the header, so adding a route to site.json
+ * updates both places. There isn't a second list to forget later.
+ *
+ * On wide screens, the trail and links share one set of normalized coordinates,
+ * which keeps the dotted line running through each star as the container grows.
+ * Below 46rem, the links become an ordinary list. That is easier to use with a
+ * thumb than a set of targets scattered up and down a curve.
+ *
+ * The path uses vector-effect="non-scaling-stroke" because
+ * preserveAspectRatio="none" stretches the viewBox. Without it, the round
+ * dashes would stretch too.
+ */
+const routes = site.nav as { label: string; href: string }[];
+
+/** Use the same radius-1 star as the constellation. */
+const STAR = (() => {
+  const points: string[] = [];
+  for (let i = 0; i < 10; i++) {
+    const radius = i % 2 === 0 ? 1 : 0.42;
+    const angle = ((-90 + i * 36) * Math.PI) / 180;
+    points.push(`${(Math.cos(angle) * radius).toFixed(3)},${(Math.sin(angle) * radius).toFixed(3)}`);
+  }
+  return `M${points.join('L')}Z`;
+})();
+
+/** Change the trail's vertical wander here; the path and links both follow it. */
+const AMPLITUDE = 0.26;
+
+const positions = routes.map((_, i) => ({
+  x: (i + 0.5) / routes.length,
+  y: 0.5 + AMPLITUDE * Math.sin(i * 1.15 - 0.6),
+}));
+
+/* Run the path past both viewBox edges so its start and end stay out of sight.
+   Horizontal-tangent curves keep it smooth as it passes through each star. */
+const VB = { w: 1000, h: 200 };
+const scaled = [
+  { x: -0.06, y: positions[0].y },
+  ...positions,
+  { x: 1.06, y: positions[positions.length - 1].y },
+].map((p) => ({ x: p.x * VB.w, y: p.y * VB.h }));
+
+const trailPath = scaled.reduce((d, point, i) => {
+  if (i === 0) return `M${point.x.toFixed(1)},${point.y.toFixed(1)}`;
+  const prev = scaled[i - 1];
+  const midX = ((prev.x + point.x) / 2).toFixed(1);
+  return `${d} C${midX},${prev.y.toFixed(1)} ${midX},${point.y.toFixed(1)} ${point.x.toFixed(1)},${point.y.toFixed(1)}`;
+}, '');
+---
+
+<nav class="trail" aria-label="Pages you can still reach">
+  <svg
+    class="trail__line"
+    viewBox={`0 0 ${VB.w} ${VB.h}`}
+    preserveAspectRatio="none"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d={trailPath} vector-effect="non-scaling-stroke" />
+  </svg>
+
+  <ul class="trail__list">
+    {routes.map((route, i) => (
+      <li
+        class="trail__item"
+        style={`--x:${(positions[i].x * 100).toFixed(2)}%;--y:${(positions[i].y * 100).toFixed(2)}%;--hue:var(--c-${hueAt(i)});--i:${i}`}
+      >
+        <a href={href(route.href)}>
+          <svg class="trail__star" viewBox="-1.2 -1.2 2.4 2.4" aria-hidden="true" focusable="false">
+            <path d={STAR} />
+          </svg>
+          <span>{route.label}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .trail { position: relative; }
+
+  .trail__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .trail a {
+    display: grid;
+    justify-items: center;
+    gap: 0.3rem;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--band-ink);
+  }
+
+  .trail__star {
+    width: 1.9rem;
+    height: 1.9rem;
+    overflow: visible;
+    fill: var(--hue);
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .trail a:hover .trail__star,
+  .trail a:focus-visible .trail__star { transform: rotate(18deg) scale(1.18); }
+
+  /* Underline the label on hover, since the text is what identifies the link. */
+  .trail a span { text-decoration: underline solid transparent 0.14em; text-underline-offset: 0.2em; }
+  .trail a:hover span,
+  .trail a:focus-visible span { text-decoration-color: var(--hue); }
+
+  /* --- Narrow: a plain list, no curve ------------------------------- */
+
+  @media (width < 46rem) {
+    .trail__line { display: none; }
+
+    .trail__list {
+      display: grid;
+      gap: 0.9rem 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+      justify-items: center;
+    }
+
+    .trail a { grid-auto-flow: column; grid-template-columns: auto auto; align-items: center; gap: 0.5rem; }
+    .trail__star { width: 1.4rem; height: 1.4rem; }
+  }
+
+  /* --- Wide: the stars sit on the curve ----------------------------- */
+
+  @media (width >= 46rem) {
+    .trail { height: clamp(150px, 20vw, 200px); }
+
+    .trail__line {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .trail__line path {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.4);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-dasharray: 1 9;
+    }
+
+    .trail__item {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      transform: translate(-50%, -50%);
+    }
+  }
+</style>

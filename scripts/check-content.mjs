@@ -26,6 +26,7 @@ const COLLECTIONS = [
   'friends.json',
   'hashtags.json',
   'profile.json',
+  'notfound.json',
 ];
 
 /** Not a collection — a single object, so it gets the parse check only. */
@@ -60,8 +61,12 @@ function parse(file) {
 
 for (const file of SINGLETONS) parse(file);
 
+/** Parsed once here and reused below, so a bad file is only reported once. */
+const parsed = new Map();
+
 for (const file of COLLECTIONS) {
   const data = parse(file);
+  parsed.set(file, data);
   if (data === null) continue;
 
   if (!Array.isArray(data)) {
@@ -89,6 +94,22 @@ for (const file of COLLECTIONS) {
     }
     seen.set(id, i);
   });
+}
+
+/*
+ * The 404 page renders the "default" entry into its static HTML and swaps in a
+ * random one client-side. Without that entry the page would have no line at all
+ * before scripts run, or none ever if they are blocked. The schema cannot check
+ * for a specific id, so it is checked here.
+ */
+{
+  const data = parsed.get('notfound.json');
+  if (Array.isArray(data) && !data.some((entry) => entry?.id === 'default')) {
+    problems.push(
+      'notfound.json — no entry with "id": "default". The 404 page shows that one ' +
+        'before a random line is picked, so it has to be there.'
+    );
+  }
 }
 
 /*

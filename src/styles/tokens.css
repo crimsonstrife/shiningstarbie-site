@@ -63,6 +63,27 @@
   --color-surface-sunk: #f6f2fb;
   --color-rule: #e6dff2;
 
+  /*
+   * Night — the one dark ground that is hers rather than neutral. It is the
+   * logo purple's hue and saturation (264deg / 32%) taken down to 24% lightness.
+   *
+   * The depth is not a taste call. On a mid violet such as #70519e only two of
+   * the seven logo hues clear 3:1, and purple itself lands at 1.60:1, so a
+   * spectrum of stars painted on it would half disappear. Measured on this
+   * value instead:
+   *
+   *   - White text 13.04:1, white at 78% 8.57:1. Both clear AA, so this is the
+   *     one band where text is white and NOT ink; ink is 2.23:1 here.
+   *   - All seven logo hues clear 3:1 as decoration, weakest purple at 3.27:1.
+   *     The pastels clear too (5.15:1 and up), so both palettes are usable.
+   *   - The soft pink flourish reads at 7.16:1; the deep pink used on light
+   *     bands is 1.71:1 here, so the night band keeps the soft one, as the
+   *     footer does.
+   *   - The default focus outline (--color-line) is 1.33:1 here and the default
+   *     link colour is 2.60:1, so both are overridden in global.css.
+   */
+  --color-night: #392951;
+
   /* --- Semantic ----------------------------------------------------- */
   --color-accent: var(--c-purple-deep);
   --color-accent-bright: var(--c-purple);
@@ -115,7 +136,8 @@
    * Override per heading with <SectionHeading flourishColor="..." />, or
    * anywhere by setting --flourish-color on a wrapper.
    */
-  --flourish-color: #ffa6c6;
+  --flourish-color-soft: #ffa6c6;
+  --flourish-color: var(--flourish-color-soft);
   --flourish-color-deep: #a9003d;
 
   /* --- Motion ------------------------------------------------------- */

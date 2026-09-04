@@ -50,12 +50,12 @@ changing the design.
 src/
 ├─ content.config.ts     # every collection + its schema — start here
 ├─ data/                 # JSON: socials, support, credits, friends,
-│                        #   hashtags, profile, credit-roles, site
+│                        #   hashtags, profile, credit-roles, notfound, site
 ├─ content/
 │  ├─ pages/             # prose: intro, lore, character forms, Nocturne
 │  └─ works/             # one .md per piece of art / music / sound
 ├─ assets/brand/         # her logo, graphics, confetti and star overlays
-├─ components/           # Band, LinkRow, FactList, WorkMedia…
+├─ components/           # Band, LinkRow, FactList, WorkMedia, Constellation404…
 ├─ layouts/BaseLayout.astro
 ├─ lib/                  # sorting, hue helpers, small shared utilities
 ├─ pages/                # routes
@@ -145,6 +145,47 @@ pages carry their own `image` and `credit` in frontmatter, while `friends` and
 `image()` **does** work inside `file()`-loaded JSON collections, with paths
 resolved relative to the JSON file. I verified that end to end because a wrong
 assumption here usually leaves an empty image rather than a useful error.
+
+### The 404 page
+
+The 404 shows one of a selection of lines at random, picked fresh on each visit, and
+the picture that goes with it if that line has one. Both live in
+`src/data/notfound.json`, so adding one is an ordinary content edit:
+
+```json
+{
+  "id": "nox-ate-it",
+  "line": "Nox ate it. He's not sorry.",
+  "image": "../assets/art/nocturne-chibi.png",
+  "imageAlt": "Nox, a round black wyvern with his rainbow tongue out",
+  "credit": { "name": "Starbie", "role": "Illustration", "url": "https://vgen.co/starbie" }
+}
+```
+
+Only `id` and `line` are required. Leave the other three out for a line with no
+picture — most of them have none as I made them up on the spot for now. An entry with an `image` **must** have an
+`imageAlt`; the schema refuses to build without it, because an undescribed
+picture is invisible to anyone using a screen reader.
+
+Two things about it are deliberate:
+
+**The entry with `id: "default"` is special.** It is the one rendered into the
+static HTML, so it is what a visitor sees if JavaScript never runs. Deleting it
+would leave the page with no line at all, and nothing about that failure would
+show up in a successful build — so `scripts/check-content.mjs` refuses to build
+without it.
+
+**Only one picture is ever downloaded.** Each illustration is resolved to its
+final optimized URL at build time and the list is handed to the browser as
+JSON, rather than rendering every entry into the page and hiding all but one.
+The hidden-entry approach would make the 404 fetch every picture in the file
+and grow a little heavier each time we added one, which is the sort of thing
+nobody notices until the page is slow.
+
+The band behind it is the `night` tone — the only dark ground on the site, and
+the reason it exists. The constellation paints stars in all seven wordmark
+hues, and on any of the light bands most of those hues have too little contrast
+to be seen. `tokens.css` records the measurements.
 
 ### Deployment
 

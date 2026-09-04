@@ -9,7 +9,18 @@
  * it for the label, where it wouldn't have enough contrast.
  */
 interface Props {
-  tone?: 'white' | 'sunk' | 'yellow' | 'lavender' | 'sky' | 'mint' | 'blossom' | 'baby' | 'lilac';
+  tone?:
+    | 'white'
+    | 'sunk'
+    | 'yellow'
+    | 'lavender'
+    | 'sky'
+    | 'mint'
+    | 'blossom'
+    | 'baby'
+    | 'lilac'
+    /** The one dark ground. Text goes white here, not ink. See tokens.css. */
+    | 'night';
   /** Optional background texture. */
   texture?: 'none' | 'grid' | 'stars';
   /** Tone of the band that follows, which fills the cloud edge drawn below. */
@@ -31,6 +42,7 @@ const TONE_BG: Record<string, string> = {
   blossom: 'var(--c-blossom)',
   baby: 'var(--c-baby)',
   lilac: 'var(--c-lilac)',
+  night: 'var(--color-night)',
 };
 
 /** The bright spectrum color each tone uses for link underlines. */
@@ -44,16 +56,20 @@ const TONE_UNDERLINE: Record<string, string> = {
   blossom: 'var(--c-teal)',
   baby: 'var(--c-terracotta)',
   lilac: 'var(--c-teal)',
+  /* Gold is the warmest of the seven on the night ground, at 7.38:1. */
+  night: 'var(--c-gold)',
 };
 
-const tinted = tone !== 'white' && tone !== 'sunk';
+/* Light tints take ink; night takes white. They are handled separately. */
+const night = tone === 'night';
+const tinted = !night && tone !== 'white' && tone !== 'sunk';
 ---
 
 <section
   id={id}
   class:list={[
     'band',
-    { 'band--tinted': tinted, 'band--has-divider': divider },
+    { 'band--tinted': tinted, 'band--night': night, 'band--has-divider': divider },
     texture !== 'none' && `band--${texture}`,
     className,
   ]}
@@ -91,6 +107,18 @@ const tinted = tone !== 'white' && tone !== 'sunk';
   .band--tinted {
     --band-ink: var(--color-ink);
     --band-ink-soft: color-mix(in srgb, var(--color-ink) 78%, transparent);
+  }
+
+  /*
+   * Night inverts that: ink is 2.23:1 here, white is 13.04:1. White at 78% is
+   * 8.57:1, which is the floor — 70% drops to 4.00:1 and misses AA for body
+   * text. The soft pink flourish is restored because the deep one, chosen for
+   * light grounds above, is 1.71:1 on this.
+   */
+  .band--night {
+    --band-ink: #fff;
+    --band-ink-soft: rgba(255, 255, 255, 0.78);
+    --flourish-color: var(--flourish-color-soft);
   }
 
   .band--has-divider { padding-bottom: calc(var(--band-pad) + 64px); }

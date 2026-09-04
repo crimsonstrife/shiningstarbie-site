@@ -46,7 +46,7 @@ a { color: var(--color-link); }
  * Links therefore stay ink and use the bright color only for the underline.
  * Band sets --band-underline.
  */
-.band--tinted a {
+:is(.band--tinted, .band--night) a {
   color: var(--band-ink);
   text-decoration-color: var(--band-underline, currentColor);
   text-decoration-thickness: 0.16em;
@@ -57,6 +57,12 @@ a { color: var(--color-link); }
   outline: 3px solid var(--color-line);
   outline-offset: 3px;
   border-radius: 4px;
+}
+
+/* The default outline is 1.33:1 on the night ground, the same problem the
+   footer has, so it takes the same fix. */
+:where(.band--night a, .band--night button, .band--night [tabindex]):focus-visible {
+  outline-color: #fff;
 }
 
 ::selection { background: var(--c-lavender); color: var(--color-ink); }

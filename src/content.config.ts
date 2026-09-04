@@ -239,6 +239,36 @@ const pages = defineCollection({
     }),
 });
 
+/* ---------------------------------------------------------------------------
+   Not found — the flavor lines for the 404 page. The browser picks one at
+   random per visit, so this is the one collection where order is meaningless.
+
+   The entry with id "default" is the one rendered into the static HTML, which
+   makes it the no-JavaScript fallback. `scripts/check-content.mjs` enforces
+   that it exists, because losing it would leave a blank 404 for anyone whose
+   scripts did not run.
+   --------------------------------------------------------------------------- */
+const notFound = defineCollection({
+  loader: file('src/data/notfound.json'),
+  schema: ({ image }) =>
+    z
+      .object({
+        id: z.string(),
+        /** The line itself. A sentence or two; it sits under the heading. */
+        line: z.string().min(1),
+        /** Optional art shown beside the line. Path is relative to this JSON file. */
+        image: image().optional(),
+        /** Required whenever there is an image, per the refine below. */
+        imageAlt: z.string().optional(),
+        credit: artCredit.optional(),
+      })
+      .refine((entry) => !entry.image || Boolean(entry.imageAlt?.trim()), {
+        message:
+          'This entry has an "image" but no "imageAlt". Add a short description of the picture.',
+        path: ['imageAlt'],
+      }),
+});
+
 export const collections = {
   socials,
   support,
@@ -249,4 +279,5 @@ export const collections = {
   profile,
   works,
   pages,
+  notFound,
 };

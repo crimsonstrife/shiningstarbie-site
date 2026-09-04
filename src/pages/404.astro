@@ -1,18 +1,217 @@
 ---
+import { getCollection } from 'astro:content';
+import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Band from '../components/Band.astro';
+import Constellation404 from '../components/Constellation404.astro';
+import StarTrail from '../components/StarTrail.astro';
 import { href } from '../lib/urls';
+
+/**
+ * The 404 page picks one of Starbie's lines at random on each visit and shows
+ * the picture that goes with it, if that entry has one. Both come from
+ * src/data/notfound.json, so adding a new one is a JSON edit and nothing else.
+ *
+ * Why the picking is done this way:
+ *
+ * `getImage()` is server-only, so each illustration is resolved to its final
+ * optimized URL here at build time and the list is handed to the browser as
+ * JSON. The alternative — rendering every entry and unhiding one — would make
+ * the 404 fetch every picture in the file, growing quietly each time she adds
+ * one. This way exactly one image is ever requested.
+ *
+ * The `default` entry is rendered into the static HTML, so a visitor with no
+ * JavaScript still gets a finished page with the plain line and no picture.
+ * That is also why check-content.mjs refuses to build without an entry by that
+ * id: losing it would leave a blank space.
+ *
+ * The picture sits out of the flow in the corner of the band, so the random one
+ * arriving after the script runs cannot shift the text underneath it.
+ */
+const entries = await getCollection('notFound');
+
+/** Twice the widest the picture is ever displayed, for hi-dpi screens. */
+const IMAGE_WIDTH = 640;
+
+const lines = await Promise.all(
+  entries.map(async (entry) => {
+    const { line, image, imageAlt, credit } = entry.data;
+    if (!image) return { line };
+
+    const optimised = await getImage({ src: image, width: IMAGE_WIDTH, format: 'webp' });
+    return {
+      line,
+      imageAlt,
+      credit,
+      image: {
+        src: optimised.src,
+        width: IMAGE_WIDTH,
+        height: Math.round((image.height / image.width) * IMAGE_WIDTH),
+      },
+    };
+  })
+);
+
+const fallback = entries.find((entry) => entry.id === 'default')!;
 ---
 
 <BaseLayout title="Page not found" description="That page has wandered off.">
-  <Band tone="lilac">
-    <h1>Lost in the stars</h1>
-    <p>That page doesn't exist — it may have moved, or the link might be a little old.</p>
-    <p class="back"><a href={href('/')}>Head back home →</a></p>
+  <Band tone="night">
+    <div class="notfound">
+      <div class="notfound__chart"><Constellation404 /></div>
+
+      <h1>Lost in the stars</h1>
+      <p class="notfound__line" id="nf-line">{fallback.data.line}</p>
+
+      <p class="notfound__home"><a href={href('/')}>Head back home →</a></p>
+
+      <div class="notfound__trail" id="nf-trail"><StarTrail /></div>
+    </div>
+
+    <figure class="notfound__art" id="nf-art" hidden>
+      <img id="nf-img" src="" alt="" decoding="async" />
+      <figcaption id="nf-credit"></figcaption>
+    </figure>
+
+    {/* is:inline because this is data, not code — the same shape BaseLayout
+        uses for its JSON-LD. Without it Astro warns that it cannot process a
+        script carrying attributes, which here is exactly the intent. */}
+    <script is:inline type="application/json" id="nf-data" set:html={JSON.stringify(lines)} />
   </Band>
 </BaseLayout>
 
+<script>
+  type Entry = {
+    line: string;
+    imageAlt?: string;
+    credit?: { name: string; role?: string; url?: string };
+    image?: { src: string; width: number; height: number };
+  };
+
+  const source = document.getElementById('nf-data');
+  const line = document.getElementById('nf-line');
+  const art = document.getElementById('nf-art');
+  const picture = document.getElementById('nf-img') as HTMLImageElement | null;
+  const caption = document.getElementById('nf-credit');
+
+  if (source?.textContent && line && art && picture && caption) {
+    const entries: Entry[] = JSON.parse(source.textContent);
+    const pick = entries[Math.floor(Math.random() * entries.length)];
+
+    if (pick) {
+      line.textContent = pick.line;
+
+      if (pick.image) {
+        picture.src = pick.image.src;
+        picture.width = pick.image.width;
+        picture.height = pick.image.height;
+        picture.alt = pick.imageAlt ?? '';
+
+        caption.replaceChildren();
+        if (pick.credit) {
+          caption.append(`${pick.credit.role ?? 'Art'} by `);
+          if (pick.credit.url) {
+            const link = document.createElement('a');
+            link.href = pick.credit.url;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            link.textContent = pick.credit.name;
+            caption.append(link);
+          } else {
+            caption.append(pick.credit.name);
+          }
+        }
+
+        art.hidden = false;
+
+        // Only now is the corner actually occupied, so this is when the trail
+        // is told to keep clear of it. Five of the six lines have no picture,
+        // and reserving the space for them would leave the trail shoved off to
+        // one side of an empty band.
+        document
+          .getElementById('nf-trail')
+          ?.style.setProperty('--art-gap', 'clamp(230px, 24vw, 350px)');
+      }
+    }
+  }
+</script>
+
 <style>
-  h1 { font-size: var(--size-hero); margin-bottom: 0.75rem; }
-  .back { margin-top: 1.5rem; font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; }
+  .notfound {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    gap: 0.6rem;
+  }
+
+  .notfound__chart {
+    width: 100%;
+    display: grid;
+    justify-items: center;
+    margin-bottom: clamp(1.25rem, 3vw, 2.25rem);
+  }
+
+  h1 { font-size: var(--size-hero); }
+
+  .notfound__line {
+    max-width: 44ch;
+    font-size: var(--size-block);
+    color: var(--band-ink-soft);
+  }
+
+  .notfound__home {
+    margin-top: 1.4rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+
+  .notfound__trail { width: 100%; margin-top: clamp(2rem, 5vw, 3.5rem); }
+
+  /* --- The picture -------------------------------------------------- */
+
+  .notfound__art { margin: 2rem 0 0; display: grid; gap: 0.4rem; justify-items: center; }
+  .notfound__art[hidden] { display: none; }
+
+  .notfound__art img { display: block; width: clamp(150px, 40vw, 240px); height: auto; }
+
+  .notfound__art figcaption { font-size: var(--size-small); color: var(--band-ink-soft); }
+
+  /*
+   * Out of the flow on wide screens, so the picture that comes with the random
+   * line lands in the corner of the band instead of moving the text. On narrow
+   * ones it stays in the flow at the very end, where a reflow costs nothing.
+   */
+  @media (width >= 60rem) {
+    .notfound__art {
+      position: absolute;
+      right: clamp(1rem, 4vw, 4rem);
+      bottom: clamp(1rem, 3vw, 2.5rem);
+      margin: 0;
+      z-index: 1;
+      justify-items: end;
+    }
+
+    .notfound__art img { width: clamp(180px, 19vw, 270px); }
+
+    /*
+     * The trail stops short of the corner the picture occupies, so the two
+     * cannot overlap. Both are measured from the same edge — the picture is
+     * positioned against Band's .wrap, which is the trail's container too — so
+     * one inset covers every width rather than only the one it was checked at.
+     *
+     * The value is set by the script, and only when a picture is actually
+     * shown; --art-gap is otherwise unset and the trail runs the full width.
+     */
+    .notfound__trail { padding-right: var(--art-gap, 0px); }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .notfound__art { animation: drift 7s var(--ease) infinite; }
+  }
+
+  @keyframes drift {
+    0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+    50% { transform: translateY(-10px) rotate(1.5deg); }
+  }
 </style>

@@ -1,0 +1,202 @@
+---
+import { hueAt } from '../lib/hues';
+
+/**
+ * This draws “404” as three constellations.
+ *
+ * Each corner of a numeral gets a large star, with thin lines between them and
+ * smaller stars behind. The large stars use the seven wordmark hues in order,
+ * so the colour sequence continues across the whole number instead of starting
+ * over on each digit.
+ *
+ * The band underneath has to be `night`. All seven hues clear 3:1 there; on a
+ * mid violet, only two do, and the purple stars nearly disappear. The measured
+ * contrast ratios are in tokens.css.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+/** Draw the five-point star once at radius 1, then scale each copy as needed. */
+const STAR = (() => {
+  const points: string[] = [];
+  for (let i = 0; i < 10; i++) {
+    const radius = i % 2 === 0 ? 1 : 0.42;
+    const angle = ((-90 + i * 36) * Math.PI) / 180;
+    points.push(`${(Math.cos(angle) * radius).toFixed(3)},${(Math.sin(angle) * radius).toFixed(3)}`);
+  }
+  return `M${points.join('L')}Z`;
+})();
+
+type Point = { x: number; y: number; r: number };
+type Glyph = { points: Point[]; lines: [number, number][] };
+
+/**
+ * The four's vertical stroke crosses its bar at index 3. Putting a star there
+ * means every line still begins and ends on one.
+ */
+const four = (ox: number): Glyph => ({
+  points: [
+    { x: ox + 110, y: 10, r: 8 },   // 0  top of the stem
+    { x: ox + 69, y: 71, r: 6 },    // 1  along the diagonal
+    { x: ox + 28, y: 132, r: 8.5 }, // 2  the corner
+    { x: ox + 110, y: 132, r: 7 },  // 3  where stem meets bar
+    { x: ox + 152, y: 132, r: 6.5 },// 4  end of the bar
+    { x: ox + 110, y: 172, r: 5.5 },// 5  along the stem
+    { x: ox + 110, y: 212, r: 8 },  // 6  foot of the stem
+  ],
+  lines: [
+    [0, 1], [1, 2], [2, 3], [3, 4], [0, 3], [3, 5], [5, 6],
+  ],
+});
+
+/** The zero is ten stars around an ellipse, joined into a closed ring. */
+const zero = (ox: number): Glyph => {
+  const count = 10;
+  const points = Array.from({ length: count }, (_, i) => {
+    const angle = ((-90 + i * (360 / count)) * Math.PI) / 180;
+    return {
+      x: ox + 82 + Math.cos(angle) * 62,
+      y: 111 + Math.sin(angle) * 101,
+      r: i % 2 === 0 ? 7.5 : 5.5,
+    };
+  });
+  const lines = points.map((_, i) => [i, (i + 1) % count] as [number, number]);
+  return { points, lines };
+};
+
+const GLYPH_W = 180;
+const glyphs: Glyph[] = [four(0), zero(GLYPH_W), four(GLYPH_W * 2)];
+
+/* Flatten the points so the hue cycle continues across all three glyphs. */
+const stars = glyphs.flatMap((g) => g.points);
+const strokes = glyphs.flatMap((g, gi) =>
+  g.lines.map(([a, b]) => {
+    const offset = glyphs.slice(0, gi).reduce((n, prev) => n + prev.points.length, 0);
+    return { a: g.points[a], b: g.points[b], i: offset + a };
+  })
+);
+
+/**
+ * Keep the background positions in a fixed list. Math.random() would make two
+ * builds of the same commit produce different HTML for no useful reason.
+ */
+const PASTELS = ['yellow', 'sky', 'mint', 'baby', 'lilac'] as const;
+const dust = [
+  [18, 34], [92, 196], [147, 18], [214, 96], [268, 226], [305, 42],
+  [352, 152], [398, 20], [441, 206], [487, 74], [520, 168], [554, 30],
+  [58, 148], [176, 118], [246, 8], [330, 210], [462, 130], [538, 224],
+].map(([x, y], i) => ({
+  x,
+  y,
+  r: 2 + ((i * 7) % 3),
+  hue: PASTELS[i % PASTELS.length],
+}));
+
+const width = GLYPH_W * 2 + 180;
+---
+
+<svg
+  class:list={['constellation', className]}
+  viewBox={`-24 -24 ${width + 48} 270`}
+  role="img"
+  aria-label="404"
+  focusable="false"
+>
+  <g class="dust">
+    {dust.map((d, i) => (
+      <path
+        d={STAR}
+        transform={`translate(${d.x},${d.y}) scale(${d.r})`}
+        fill={`var(--c-${d.hue})`}
+        style={`--i:${i}`}
+      />
+    ))}
+  </g>
+
+  <g class="lines">
+    {strokes.map((s, i) => (
+      <line x1={s.a.x} y1={s.a.y} x2={s.b.x} y2={s.b.y} style={`--i:${i}`} />
+    ))}
+  </g>
+
+  <g class="stars">
+    {stars.map((s, i) => (
+      <path
+        d={STAR}
+        transform={`translate(${s.x.toFixed(1)},${s.y.toFixed(1)}) scale(${s.r})`}
+        fill={`var(--c-${hueAt(i)})`}
+        style={`--i:${i}`}
+      />
+    ))}
+  </g>
+</svg>
+
+<style>
+  .constellation {
+    display: block;
+    width: 100%;
+    max-width: 640px;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* Fade in the lines first, then the stars, so the shape remains readable. */
+  .lines line {
+    stroke: rgba(255, 255, 255, 0.42);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    opacity: 0;
+    animation: fade-in 620ms var(--ease) forwards;
+    animation-delay: calc(var(--i) * 34ms);
+  }
+
+  .stars path {
+    opacity: 0;
+    animation:
+      fade-in 460ms var(--ease) forwards,
+      twinkle 4.4s var(--ease) infinite;
+    animation-delay: calc(900ms + var(--i) * 46ms), calc(1.4s + var(--i) * 137ms);
+  }
+
+  /* Keep the smaller stars dim enough that they don't compete with the 404. */
+  .dust path {
+    --rest: 0.68;
+    opacity: 0;
+    animation:
+      fade-in-dust 900ms var(--ease) forwards,
+      twinkle-dust 6.2s var(--ease) infinite;
+    animation-delay: calc(var(--i) * 60ms), calc(1s + var(--i) * 211ms);
+  }
+
+  @keyframes fade-in {
+    to { opacity: 1; }
+  }
+
+  @keyframes fade-in-dust {
+    to { opacity: var(--rest); }
+  }
+
+  /* Don't fade to zero; a missing star looks more like a rendering fault. */
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  @keyframes twinkle-dust {
+    0%, 100% { opacity: var(--rest); }
+    50% { opacity: 0.3; }
+  }
+
+  /*
+   * Reduced motion keeps the picture but drops the animation. The shared tokens
+   * already set durations to zero, but these elements begin at opacity 0, so the
+   * animations have to be removed rather than merely shortened.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .lines line,
+    .stars path { animation: none; opacity: 1; }
+    .dust path { animation: none; opacity: var(--rest); }
+  }
+</style>
